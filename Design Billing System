@@ -1,0 +1,78 @@
+class Product:
+    def __init__(self, product_id: int, product_name: str, price: float):
+        self._product_id = product_id
+        self._product_name = product_name
+        self._price = price
+
+    def get_product_id(self):
+        return self._product_id
+
+    def set_product_id(self, product_id: int):
+        self._product_id = product_id
+
+    def get_name(self):
+        return self._product_name
+
+    def set_name(self, name: str):
+        self._product_name = name
+
+    def get_price(self):
+        return self._price
+
+    def set_price(self, price: float):
+        self._price = price
+
+
+class Order:
+    def __init__(self, order_id: int, product: Product, quantity: int):
+        self.__order_id = order_id
+        self.__product = product
+        self.__quantity = quantity
+
+    def get_product(self):
+        return self.__product
+
+    def get_quantity(self):
+        return self.__quantity
+
+
+class Cart:
+    def __init__(self, delivery_24hrs: bool = False):
+        self._orders = []
+        self._delivery_24hrs = delivery_24hrs
+        
+    def add_order(self, order: Order):
+        self._orders.append(order)
+
+
+class User:
+    def __init__(
+        self, 
+        login_id: str,
+        password: str,
+        phone: int,
+        delivery_addr: str,
+        cart: Cart,
+        is_Prime: bool = False
+    ):
+        self.__login_id = login_id
+        self.__password = password
+        self.__phone = phone
+        self.__delivery_addr = delivery_addr
+        self.__cart = cart
+        self.__is_Prime = is_Prime
+
+
+class PaymentProcessor:
+    def process_payment(self, amount: float) -> bool:
+        print(f"Processing payment of ${amount:.2f}")
+        # Real integration with payment gateway would happen here.
+        return True
+        
+    def calculate_total(self, cart: Cart) -> float:
+        total = 0.0
+        for order in cart._orders:
+            product = order.get_product()
+            quantity = order.get_quantity()
+            total += product.get_price() * quantity
+        return total
