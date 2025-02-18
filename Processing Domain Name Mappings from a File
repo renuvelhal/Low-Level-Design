@@ -1,3 +1,5 @@
+import datetime
+
 # Class to read a file and store its contents in a dictionary (hashmap equivalent in Python)
 class FileReader:
     def __init__(self):
@@ -37,6 +39,14 @@ class FileReader:
         """
         return self.map.get(domain, [None])[0]  # Return first IP if exists, else None
 
+    def assign_ip_to_domain(self, domain, ip):
+        """
+        Assigns a new IP address to the given domain.
+        If the domain already exists, it appends the new IP to the list along with a timestamp.
+        """
+        timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")  # Get current timestamp
+        self.map.setdefault(domain, []).append((ip, timestamp))  # Store IP with timestamp
+
 
 # Class representing the main program flow
 class Main:
@@ -56,17 +66,47 @@ class Main:
 
 # Class that represents a Load Balancer, which processes a file independently
 class LoadBalancer:
-    def __init__(self, file_location):
+    def __init__(self):
         """
-        Constructor to initialize the LoadBalancer with a file location.
+        Constructor to initialize the LoadBalancer.
         """
-        self.file_location = file_location  # Store the file location
         self.map = {}  # Initialize an empty dictionary
 
-    def process(self):
+    def assign_ip(self, domain_name, ip_type):
         """
-        Function to process the file using FileReader.
+        Assigns an IP to a given domain name based on type, including a timestamp.
         """
-        file_reader = FileReader()  # Creating an instance of FileReader class
-        self.map = file_reader.process_file(self.file_location)  # Process file and store the data
+        timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")  # Get current timestamp
+        return f"Assigned {ip_type} IP to {domain_name} at {timestamp}"  # Return assignment message
 
+
+# Main execution block to run the script
+if __name__ == "__main__":
+    # Creating an instance of Main class and running the program
+    main = Main()
+    main.run()  # Run the main process
+    print("Global Map in Main:", main.map)  # Print the stored data in Main class
+
+    # Creating an instance of LoadBalancer
+    load_balancer = LoadBalancer()
+    
+    # Example domain names and IP type
+    domain_names = ["xyz", "abc", "abc", "abc", "abc"]
+    ip_type = "random"
+    
+    # Assign IPs to domain names and print results
+    for domain_name in domain_names:
+        print(load_balancer.assign_ip(domain_name, ip_type))
+
+    # Example: Fetching a single IP for a given domain
+    file_reader = FileReader()
+    file_reader.process_file("domainname.txt")  # Process the file first
+    domain = "xyz"  # Example domain to look up
+    ip_address = file_reader.get_ip_for_domain(domain)
+    print(f"Single IP for domain '{domain}':", ip_address)  # Print the fetched IP
+
+    # Example: Assigning a new IP to a domain with a timestamp
+    new_domain = "example.com"
+    new_ip = "192.168.1.1"
+    file_reader.assign_ip_to_domain(new_domain, new_ip)  # Assign new IP to the domain
+    print(f"Updated Map after assigning IP to '{new_domain}':", file_reader.map)  # Print updated map
