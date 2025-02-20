@@ -1,0 +1,65 @@
+import heapq
+from enum import Enum
+class Direction(Enum):
+    UP=1
+    DOWN=-1
+    IDLE=0
+
+class Elevator:
+    def __init__(self, id, max_floor):
+        self.id=id
+        self.current_floor =0
+        self.direction=Direction.IDLE
+        self.up_queue=[]
+        self.down_queue=[]
+        
+    def add_request(self, floor):
+        if floor>self.current_floor:
+            heapq.heappush(self.up_queue, floor)
+        elif floor<self.current_floor:
+            heapq.heappush(self.down_queue,-floor)
+        else:
+            print(f"Elevator {self.id} already at floor {floor}")
+    
+    def move(self):
+        if self.direction==Direction.UP or self.direction == Direction.IDLE:
+            if self.up_queue:
+                next_floor=heapq.heappop(self.up_queue)
+                self._move_to_floor(next_floor)
+            elif self.down_queue:
+                self.direction=Direction.DOWN
+            else:
+                self.direction =Direction.IDLE
+        elif self.Direction==self.Direction.DOWN:
+            if self.down_queue:
+                next_floor=-heapq.heappop(self.down_queue)
+            elif self.up_queue:
+                self.direction=Direction.UP
+            else:
+                self.Direction=Direction.IDLE
+    def _move_to_floor(self, floor):
+        while self.current_floor<floor:
+            self.current_floor+=1
+            print(f"Elevator {self.id} going up to floor { self.current_floor}")
+        while self.current_floor>floor:
+            print(f"Elevator {self.id} going down to floor {self.current_floor}")
+        print(f"Elevator {self.id} already at {self.current_floor}")
+
+class ElevatorController:
+    def __init__(self, num_elevators, max_floor):
+        self.elevators =[Elevator (i, max_floor) for i in range(num_elevators)]
+    
+    def request_elevator(self, floor, direction):
+        best_elevator=None
+        min_distance=float("inf")
+        for elevator in self.elevator:
+            distance=abs(elevator.current_floor-floor)
+            if elevator.direction == direction or elevator.direction ==Direction.IDLE:
+                if distance<min_distance:
+                    best_elevator=elevator
+                    min_distance=distance
+        return best_elevator or self.elevators[0]
+    
+    def step(self):
+        for elevator in self.elevator:
+            elevator.move()
